@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パーリンノイズ地形生成</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="terrainCanvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script>
+        let noiseScale = 0.02;
+        let seed;
+
+        function setup() {
+            const canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('terrainCanvas');
+            seed = getSeedFromURL();
+            randomSeed(seed);
+            generateTerrain();
+        }
+
+        function generateTerrain() {
+            loadPixels();
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    let noiseVal = noise(x * noiseScale, y * noiseScale);
+                    let bright = map(noiseVal, 0, 1, 0, 255);
+                    set(x, y, color(bright));
+                }
+            }
+            updatePixels();
+        }
+
+        function getSeedFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('seed') || '0';
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            generateTerrain();
+        }
+    </script>
+</body>
+</html>
